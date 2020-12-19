@@ -1,0 +1,136 @@
+name: Docker publish
+
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  docker-base-image:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        component:
+          - chartserver
+          - trivy-adapter
+          - core
+          - db
+          - jobservice
+          - log
+          - nginx
+          - notary-server
+          - notary-signer
+          - portal
+          - prepare
+          - redis
+          - registry
+          - registryctl
+
+    defaults:
+      run:
+        working-directory: ./harbor
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - uses: docker/setup-qemu-action@v1
+      - uses: docker/setup-buildx-action@v1
+        with:
+          driver-opts: network=host
+      - uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+
+      - run: sh ../.hack/patch.sh
+
+      - name: Build base image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./harbor
+          file: ./harbor/make/photon/${{ matrix.component }}/Dockerfile.base
+          platforms: linux/amd64,linux/arm64
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ghcr.io/${{ github.repository }}/harbor-${{ matrix.component }}-base:dev
+
+  docker-image:
+    needs:
+      - docker-base-image
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        component:
+          - prepare
+          - db
+          - portal
+          - core
+          - jobservice
+          - log
+          - nginx
+          - registryctl
+          - notary_server
+          - notary_signer
+          - trivy_adapter
+          - redis
+          - chart_server
+          - standalone_db_migrator
+          - exporter
+
+    defaults:
+      run:
+        working-directory: ./harbor
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - uses: docker/setup-qemu-action@v1
+      - uses: docker/setup-buildx-action@v1
+        with:
+          driver-opts: network=host
+      - uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.CR_PAT }}
+
+      - run: sh ../.hack/patch.sh
+
+      - name: Build & Publish images
+        env:
+          REGISTRYPROJECTNAME: ghcr.io/${{ github.repository }}
+          IMAGELABELS: org.opencontainers.image.source=https://github.com/${{ github.repository }} org.opencontainers.image.revision=${{ github.sha }}
+          MULTIARCH: true
+          TRIVYFLAG: true
+          CHARTFLAG: true
+          NOTARYFLAG: true
+        run: |
+          set -eux;
+
+          CTX="MULTIARCH=${MULTIARCH} REGISTRYPROJECTNAME=${REGISTRYPROJECTNAME} TRIVYFLAG=${TRIVYFLAG} CHARTFLAG=${CHARTFLAG} NOTARYFLAG=${CHARTFLAG}"
+
+          sudo make versions_prepare ${CTX};
+
+          case ${{ matrix.component }} in
+            core)                   sudo make compile_core ${CTX} ;;
+            jobservice)             sudo make compile_jobservice ${CTX};;
+            registryctl)            sudo make compile_registryctl ${CTX};;
+            notary*)                sudo make compile_notary_migrate_patch ${CTX} ;;
+            standalone_db_migrator) sudo make compile_standalone_db_migrator ${CTX} ;;
+          esac;
+
+          case ${{ matrix.component }} in
+            exporter)    sudo make compile_exporter ${CTX} ;;
+            registryctl) sudo make build BUILDTARGET="_build_registry _build_registryctl" ${CTX} ;;
+            notary*)     sudo make build BUILDTARGET="_build_notary_binary _build_${{ matrix.component }}" ${CTX} ;;
+            *)           sudo make build BUILDTARGET="_build_${{ matrix.component }}" ${CTX} ;;
+          esac;

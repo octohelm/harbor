@@ -1,0 +1,81 @@
+harbor:
+  expose:
+    type: ingress
+    tls:
+      enabled: false
+    ingress:
+      hosts:
+        core: harbor.rktl.work
+        notary: notary.rktl.work
+
+  externalURL: https://harbor.rktl.work
+
+  harborAdminPassword: Harbor12345
+  imagePullPolicy: Always
+
+  persistence:
+    enabled: true
+    registry:
+      storageClass: "local-path"
+    database:
+      storageClass: "local-path"
+    trivy:
+      storageClass: "local-path"
+  portal:
+    image:
+      repository: ghcr.io/querycap/harbor/harbor-portal
+      tag: dev
+  core:
+    image:
+      repository: ghcr.io/querycap/harbor/harbor-core
+      tag: dev
+  jobservice:
+    image:
+      repository: ghcr.io/querycap/harbor/harbor-jobservice
+      tag: dev
+    storageClass: local-path
+  registry:
+    # important for deploy
+    relativeurls: true
+    registry:
+      image:
+        repository: ghcr.io/querycap/harbor/registry-photon
+        tag: dev
+    controller:
+      image:
+        repository: ghcr.io/querycap/harbor/harbor-registryctl
+        tag: dev
+  chartmuseum:
+    enabled: true
+    image:
+      repository: ghcr.io/querycap/harbor/chartmuseum-photon
+      tag: dev
+  trivy:
+    enabled: true
+    image:
+      repository: ghcr.io/querycap/harbor/trivy-adapter-photon
+      tag: dev
+  notary:
+    enabled: true
+    server:
+      image:
+        repository: ghcr.io/querycap/harbor/notary-server-photon
+        tag: dev
+    signer:
+      image:
+        repository: ghcr.io/querycap/harbor/notary-signer-photon
+        tag: dev
+  database:
+    type: internal
+    internal:
+      image:
+        repository: ghcr.io/querycap/harbor/harbor-db
+        tag: dev
+  redis:
+    type: internal
+    internal:
+      image:
+        repository: ghcr.io/querycap/harbor/redis-photon
+        tag: dev
+  clair:
+    enabled: false
