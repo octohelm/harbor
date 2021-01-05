@@ -24,15 +24,15 @@ harbor:
   portal:
     image:
       repository: ghcr.io/querycap/harbor/harbor-portal
-      tag: dev
+      tag: sha-fb76a46
   core:
     image:
       repository: ghcr.io/querycap/harbor/harbor-core
-      tag: dev
+      tag: sha-fb76a46
   jobservice:
     image:
       repository: ghcr.io/querycap/harbor/harbor-jobservice
-      tag: dev
+      tag: sha-fb76a46
     storageClass: local-path
   registry:
     # important for deploy
@@ -40,42 +40,42 @@ harbor:
     registry:
       image:
         repository: ghcr.io/querycap/harbor/registry-photon
-        tag: dev
+        tag: sha-fb76a46
     controller:
       image:
         repository: ghcr.io/querycap/harbor/harbor-registryctl
-        tag: dev
+        tag: sha-fb76a46
   chartmuseum:
     enabled: true
     image:
       repository: ghcr.io/querycap/harbor/chartmuseum-photon
-      tag: dev
+      tag: sha-fb76a46
   trivy:
     enabled: true
     image:
       repository: ghcr.io/querycap/harbor/trivy-adapter-photon
-      tag: dev
+      tag: sha-fb76a46
   notary:
     enabled: true
     server:
       image:
         repository: ghcr.io/querycap/harbor/notary-server-photon
-        tag: dev
+        tag: sha-fb76a46
     signer:
       image:
         repository: ghcr.io/querycap/harbor/notary-signer-photon
-        tag: dev
+        tag: sha-fb76a46
   database:
     type: internal
     internal:
       image:
         repository: ghcr.io/querycap/harbor/harbor-db
-        tag: dev
+        tag: sha-fb76a46
   redis:
     type: internal
     internal:
       image:
         repository: ghcr.io/querycap/harbor/redis-photon
-        tag: dev
+        tag: sha-fb76a46
   clair:
     enabled: false
