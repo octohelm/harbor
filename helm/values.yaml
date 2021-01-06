@@ -24,15 +24,15 @@ harbor:
   portal:
     image:
       repository: ghcr.io/querycap/harbor/harbor-portal
-      tag: sha-2cb7bb7
+      tag: sha-9d7d5b0
   core:
     image:
       repository: ghcr.io/querycap/harbor/harbor-core
-      tag: sha-2cb7bb7
+      tag: sha-9d7d5b0
   jobservice:
     image:
       repository: ghcr.io/querycap/harbor/harbor-jobservice
-      tag: sha-2cb7bb7
+      tag: sha-9d7d5b0
     storageClass: local-path
   registry:
     # important for deploy
@@ -40,42 +40,42 @@ harbor:
     registry:
       image:
         repository: ghcr.io/querycap/harbor/registry-photon
-        tag: sha-2cb7bb7
+        tag: sha-9d7d5b0
     controller:
       image:
         repository: ghcr.io/querycap/harbor/harbor-registryctl
-        tag: sha-2cb7bb7
+        tag: sha-9d7d5b0
   chartmuseum:
     enabled: true
     image:
       repository: ghcr.io/querycap/harbor/chartmuseum-photon
-      tag: sha-2cb7bb7
+      tag: sha-9d7d5b0
   trivy:
     enabled: true
     image:
       repository: ghcr.io/querycap/harbor/trivy-adapter-photon
-      tag: sha-2cb7bb7
+      tag: sha-9d7d5b0
   notary:
     enabled: true
     server:
       image:
         repository: ghcr.io/querycap/harbor/notary-server-photon
-        tag: sha-2cb7bb7
+        tag: sha-9d7d5b0
     signer:
       image:
         repository: ghcr.io/querycap/harbor/notary-signer-photon
-        tag: sha-2cb7bb7
+        tag: sha-9d7d5b0
   database:
     type: internal
     internal:
       image:
         repository: ghcr.io/querycap/harbor/harbor-db
-        tag: sha-2cb7bb7
+        tag: sha-9d7d5b0
   redis:
     type: internal
     internal:
       image:
         repository: ghcr.io/querycap/harbor/redis-photon
-        tag: sha-2cb7bb7
+        tag: sha-9d7d5b0
   clair:
     enabled: false
