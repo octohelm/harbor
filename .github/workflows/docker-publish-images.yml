@@ -48,6 +48,9 @@ jobs:
 
       - run: sh ../.hack/patch.sh
 
+      - id: prepare
+        run: echo "::set-output name=tag::$(git describe --tags --always)"
+
       - name: Build base image
         uses: docker/build-push-action@v2
         with:
@@ -56,9 +59,9 @@ jobs:
           platforms: linux/amd64,linux/arm64
           labels: |
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
-            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.revision=${{ steps.prepare.outputs.tag }}
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ghcr.io/${{ github.repository }}/harbor-${{ matrix.component }}-base:dev
+          tags: ghcr.io/${{ github.repository }}/harbor-${{ matrix.component }}-base:${{ steps.prepare.outputs.tag }}
 
   docker-image:
     needs:
@@ -112,19 +115,21 @@ jobs:
 
       - run: sh ../.hack/patch.sh
 
+      - id: prepare
+        run: echo "::set-output name=tag::$(git describe --tags --always)"
+
       - name: Build & Publish images
         env:
           REGISTRYPROJECTNAME: ghcr.io/${{ github.repository }}
-          IMAGELABELS: org.opencontainers.image.source=https://github.com/${{ github.repository }} org.opencontainers.image.revision=${{ github.sha }}
+          IMAGELABELS: org.opencontainers.image.source=https://github.com/${{ github.repository }} org.opencontainers.image.revision=${{ steps.prepare.outputs.tag }}
           MULTIARCH: true
           TRIVYFLAG: true
           CHARTFLAG: true
           NOTARYFLAG: true
-          GITHUB_SHA: ${{ github.sha }}
         run: |
           set -eux;
 
-          CTX="VERSIONTAG=sha-${GITHUB_SHA::7} MULTIARCH=${MULTIARCH} REGISTRYPROJECTNAME=${REGISTRYPROJECTNAME} TRIVYFLAG=${TRIVYFLAG} CHARTFLAG=${CHARTFLAG} NOTARYFLAG=${CHARTFLAG}"
+          CTX="VERSIONTAG=${{ steps.prepare.outputs.tag }} BASEIMAGETAG=${{ steps.prepare.outputs.tag }} MULTIARCH=${MULTIARCH} REGISTRYPROJECTNAME=${REGISTRYPROJECTNAME} TRIVYFLAG=${TRIVYFLAG} CHARTFLAG=${CHARTFLAG} NOTARYFLAG=${CHARTFLAG}"
 
           sudo make versions_prepare ${CTX};
 
