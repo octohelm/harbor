@@ -1,15 +1,15 @@
-DEBUG ?= 1
-
-HELM ?= helm upgrade --install --create-namespace
-ifeq ($(DEBUG),1)
-	HELM = helm template --dependency-update
-endif
+VERSION = $(shell cat version)
 
 apply:
-	$(HELM) --namespace=harbor harbor ./helm
+	cuem k apply ./helm
 
 uninstall:
-	helm uninstall --namespace=harbor harbor
+	cuem k delete ./helm
 
 dep:
-	git submodule update --remote --force
+	git submodule update --init
+	git submodule update --force --remote
+	#git submodule foreach -q --recursive 'git checkout ${VERSION}'
+
+tools-install:
+	go install github.com/octohelm/cuemod/cmd/cuem@latest

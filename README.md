@@ -8,9 +8,9 @@ Live demo https://harbor.rktl.work/ (in k3s aarch64 cluster)
 # clone
 git clone https://github.com/querycap/harbor.git
 
-# check
-make apply DEBUG=1
+# install tools (require golang)
+make tools-install
 
 # deploy
-make apply DEBUG=0
+make apply
 ```
