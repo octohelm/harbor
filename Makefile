@@ -8,8 +8,8 @@ uninstall:
 
 dep:
 	git submodule update --init
-	git submodule update --force --remote
-	#git submodule foreach -q --recursive 'git checkout ${VERSION}'
+	#git submodule update --force --remote
+	git submodule foreach -q --recursive 'git checkout ${VERSION}'
 
 tools-install:
 	go install github.com/octohelm/cuemod/cmd/cuem@latest
