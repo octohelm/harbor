@@ -8,7 +8,7 @@ uninstall:
 
 dep:
 	git submodule update --init
-	#git submodule update --force --remote
+	git submodule update --force --remote
 	git submodule foreach -q --recursive 'git checkout ${VERSION}'
 
 tools-install:
