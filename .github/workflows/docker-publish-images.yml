@@ -15,6 +15,7 @@ jobs:
           - trivy-adapter
           - core
           - db
+          - exporter
           - jobservice
           - log
           - nginx
@@ -142,7 +143,7 @@ jobs:
           esac;
 
           case ${{ matrix.component }} in
-            exporter)    sudo make compile_exporter ${CTX} ;;
+            exporter)    sudo make build BUILDTARGET="_compile_and_build_exporter" ${CTX} ;;
             registryctl) sudo make build BUILDTARGET="_build_registry _build_registryctl" ${CTX} ;;
             notary*)     sudo make build BUILDTARGET="_build_notary_binary _build_${{ matrix.component }}" ${CTX} ;;
             *)           sudo make build BUILDTARGET="_build_${{ matrix.component }}" ${CTX} ;;
