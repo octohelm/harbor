@@ -1,10 +1,10 @@
 VERSION = $(shell cat version)
 
 apply:
-	cuem k apply ./helm
+	cuem k apply ./components/harbor
 
 uninstall:
-	cuem k delete ./helm
+	cuem k delete ./components/harbor
 
 dep:
 	git submodule update --init

@@ -8,12 +8,18 @@ import (
 	apiVersion: "octohelm.tech/v1alpha"
 	kind:       "Release"
 
-	#name:      "harbor"
-	#namespace: "harbor"
+	#name:      *"harbor" | string
+	#namespace: *"harbor" | string
 	#context:   *"hw-sg" | string
 
+	metadata: name:      #name
+	metadata: namespace: #namespace
+	metadata: labels: context: #context
+
 	spec: {
-		helm: {
+		kube: {
+			@translate("helm")
+
 			harbor
 
 			release: name:      #name
@@ -130,7 +136,6 @@ import (
 					"enabled": false
 				}
 			}
-
-		} @translate("helm")
+		}
 	}
 }
