@@ -117,7 +117,7 @@ jobs:
       - run: sh ../.hack/patch.sh
 
       - id: prepare
-        run: echo "::set-output name=tag::$(git describe --tags --always)"
+        run: echo "::set-output name=tag::$(cat ../version)"
 
       - name: Build & Publish images
         env:
