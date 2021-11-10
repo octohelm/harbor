@@ -3,7 +3,7 @@ name: Docker publish
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
 
 jobs:
   docker-base-image:

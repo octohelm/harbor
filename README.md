@@ -1,7 +1,5 @@
 # Harbor multi-arch images
 
-Live demo https://harbor.rktl.work/ (in k3s aarch64 cluster)
-
 # Deploy
 
 ```
