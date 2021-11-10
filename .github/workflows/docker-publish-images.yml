@@ -122,7 +122,7 @@ jobs:
       - name: Build & Publish images
         env:
           REGISTRYPROJECTNAME: ghcr.io/${{ github.repository }}
-          IMAGELABELS: org.opencontainers.image.source=https://github.com/${{ github.repository }} org.opencontainers.image.revision=${{ steps.prepare.outputs.tag }}
+          IMAGELABELS: org.opencontainers.image.source=https://github.com/${{ github.repository }}
           MULTIARCH: true
           TRIVYFLAG: true
           CHARTFLAG: true
@@ -130,7 +130,7 @@ jobs:
         run: |
           set -eux;
 
-          CTX="VERSIONTAG=${{ steps.prepare.outputs.tag }} BASEIMAGETAG=${{ steps.prepare.outputs.tag }} MULTIARCH=${MULTIARCH} REGISTRYPROJECTNAME=${REGISTRYPROJECTNAME} TRIVYFLAG=${TRIVYFLAG} CHARTFLAG=${CHARTFLAG} NOTARYFLAG=${CHARTFLAG}"
+          CTX="VERSIONTAG=${{ steps.prepare.outputs.tag }} BASEIMAGETAG=${{ steps.prepare.outputs.tag }} MULTIARCH=${MULTIARCH} REGISTRYPROJECTNAME=${REGISTRYPROJECTNAME} TRIVYFLAG=${TRIVYFLAG} CHARTFLAG=${CHARTFLAG} NOTARYFLAG=${CHARTFLAG} IMAGELABELS=${IMAGELABELS}"
 
           sudo make versions_prepare ${CTX};
 
