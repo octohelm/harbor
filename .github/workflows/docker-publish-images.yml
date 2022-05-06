@@ -32,20 +32,20 @@ jobs:
         working-directory: ./harbor
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
 
-      - uses: docker/setup-qemu-action@v1
-      - uses: docker/setup-buildx-action@v1
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
         with:
           driver: docker-container
           driver-opts: network=host
-      - uses: docker/login-action@v1
+      - uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.CR_PAT }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - run: sh ../.hack/patch.sh
 
@@ -71,6 +71,7 @@ jobs:
     runs-on: ubuntu-18.04
 
     strategy:
+      fail-fast: false
       matrix:
         component:
           - prepare
@@ -81,8 +82,7 @@ jobs:
           - log
           - nginx
           - registryctl
-          - notary_server
-          - notary_signer
+          - notary
           - trivy_adapter
           - redis
           - chart_server
@@ -94,25 +94,25 @@ jobs:
         working-directory: ./harbor
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
 
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v3
         with:
           go-version: '^1.17'
 
-      - uses: docker/setup-qemu-action@v1
-      - uses: docker/setup-buildx-action@v1
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
         with:
           driver: docker-container
           driver-opts: network=host
 
-      - uses: docker/login-action@v1
+      - uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.CR_PAT }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - run: sh ../.hack/patch.sh
 
@@ -121,7 +121,8 @@ jobs:
 
       - name: Build & Publish images
         env:
-          REGISTRYPROJECTNAME: ghcr.io/${{ github.repository }}
+          IMAGENAMESPACE: ghcr.io/${{ github.repository }}
+          BASEIMAGENAMESPACE: ghcr.io/${{ github.repository }}
           IMAGELABELS: org.opencontainers.image.source=https://github.com/${{ github.repository }}
           MULTIARCH: true
           TRIVYFLAG: true
@@ -130,7 +131,7 @@ jobs:
         run: |
           set -eux;
 
-          CTX="VERSIONTAG=${{ steps.prepare.outputs.tag }} BASEIMAGETAG=${{ steps.prepare.outputs.tag }} MULTIARCH=${MULTIARCH} REGISTRYPROJECTNAME=${REGISTRYPROJECTNAME} TRIVYFLAG=${TRIVYFLAG} CHARTFLAG=${CHARTFLAG} NOTARYFLAG=${CHARTFLAG} IMAGELABELS=${IMAGELABELS}"
+          CTX="BUILDBIN=true VERSIONTAG=${{ steps.prepare.outputs.tag }} BASEIMAGETAG=${{ steps.prepare.outputs.tag }} MULTIARCH=${MULTIARCH} IMAGENAMESPACE=${IMAGENAMESPACE} BASEIMAGENAMESPACE=${BASEIMAGENAMESPACE} TRIVYFLAG=${TRIVYFLAG} CHARTFLAG=${CHARTFLAG} NOTARYFLAG=${CHARTFLAG} IMAGELABELS=${IMAGELABELS}"
 
           sudo make versions_prepare ${CTX};
 
@@ -145,6 +146,5 @@ jobs:
           case ${{ matrix.component }} in
             exporter)    sudo make build BUILDTARGET="_compile_and_build_exporter" ${CTX} ;;
             registryctl) sudo make build BUILDTARGET="_build_registry _build_registryctl" ${CTX} ;;
-            notary*)     sudo make build BUILDTARGET="_build_notary_binary _build_${{ matrix.component }}" ${CTX} ;;
             *)           sudo make build BUILDTARGET="_build_${{ matrix.component }}" ${CTX} ;;
           esac;
