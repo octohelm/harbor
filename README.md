@@ -8,16 +8,3 @@ With the patch https://github.com/goharbor/harbor/compare/release-2.5.0...morlay
 ```shell
 https://github.com/goharbor/harbor/compare/release-2.5.0...morlay:release-2.5.0.patch | git apply -v
 ```
-
-## Deploy
-
-```
-# clone
-git clone https://github.com/querycap/harbor.git
-
-# install tools (require golang)
-make tools-install
-
-# deploy
-make apply
-```

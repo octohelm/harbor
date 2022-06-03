@@ -7,12 +7,3 @@ dep:
 
 patch: dep
 	cd harbor && sh ../.hack/patch.sh
-
-tools-install:
-	go install github.com/octohelm/cuemod/cmd/cuem@latest
-
-apply:
-	cuem k apply ./components/harbor
-
-uninstall:
-	cuem k delete ./components/harbor
