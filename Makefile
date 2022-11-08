@@ -1,4 +1,4 @@
-VERSION = $(shell cat version)
+export VERSION = $(shell cat version)
 
 dep:
 	git submodule update --init

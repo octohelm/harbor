@@ -1,6 +1,7 @@
 #!/bin/sh
 
-set -eux;
+set -eux
 
-curl https://github.com/goharbor/harbor/compare/release-2.6.0...morlay:release-2.6.0.patch | git apply -v
+VERSION=${VERSION:-"v2.6.1"}
 
+curl https://github.com/goharbor/harbor/compare/${VERSION}...morlay:patch-${VERSION}.patch | git apply -v
