@@ -11,7 +11,6 @@ jobs:
     strategy:
       matrix:
         component:
-          - chartserver
           - trivy-adapter
           - core
           - db
@@ -68,7 +67,7 @@ jobs:
     needs:
       - docker-base-image
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
@@ -85,7 +84,6 @@ jobs:
           - notary
           - trivy_adapter
           - redis
-          - chart_server
           - standalone_db_migrator
           - exporter
 
@@ -100,7 +98,7 @@ jobs:
 
       - uses: actions/setup-go@v3
         with:
-          go-version: '^1.17'
+          go-version: '^1.20.x'
 
       - uses: docker/setup-qemu-action@v2
       - uses: docker/setup-buildx-action@v2
@@ -108,13 +106,13 @@ jobs:
           driver: docker-container
           driver-opts: network=host
 
+      - run: cd .. && make patch
+
       - uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - run: cd .. && make patch
 
       - id: prepare
         run: echo "tag=$(cat ../version)" >> $GITHUB_ENV
@@ -133,18 +131,18 @@ jobs:
 
           CTX="BUILDBIN=true VERSIONTAG=${{ env.tag }} BASEIMAGETAG=${{ env.tag }} MULTIARCH=${MULTIARCH} IMAGENAMESPACE=${IMAGENAMESPACE} BASEIMAGENAMESPACE=${BASEIMAGENAMESPACE} TRIVYFLAG=${TRIVYFLAG} CHARTFLAG=${CHARTFLAG} NOTARYFLAG=${CHARTFLAG} IMAGELABELS=${IMAGELABELS}"
 
-          sudo make versions_prepare ${CTX};
+          make versions_prepare ${CTX};
 
           case ${{ matrix.component }} in
-            core)                   sudo make compile_core ${CTX} ;;
-            jobservice)             sudo make compile_jobservice ${CTX};;
-            registryctl)            sudo make compile_registryctl ${CTX};;
-            notary*)                sudo make compile_notary_migrate_patch ${CTX} ;;
-            standalone_db_migrator) sudo make compile_standalone_db_migrator ${CTX} ;;
+            core)                   make compile_core ${CTX} ;;
+            jobservice)             make compile_jobservice ${CTX};;
+            registryctl)            make compile_registryctl ${CTX};;
+            notary*)                make compile_notary_migrate_patch ${CTX} ;;
+            standalone_db_migrator) make compile_standalone_db_migrator ${CTX} ;;
           esac;
 
           case ${{ matrix.component }} in
-            exporter)    sudo make build BUILDTARGET="_compile_and_build_exporter" ${CTX} ;;
-            registryctl) sudo make build BUILDTARGET="_build_registry _build_registryctl" ${CTX} ;;
-            *)           sudo make build BUILDTARGET="_build_${{ matrix.component }}" ${CTX} ;;
+            exporter)    make build BUILDTARGET="_compile_and_build_exporter" ${CTX} ;;
+            registryctl) make build BUILDTARGET="_build_registry _build_registryctl" ${CTX} ;;
+            *)           make build BUILDTARGET="_build_${{ matrix.component }}" ${CTX} ;;
           esac;
