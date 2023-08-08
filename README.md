@@ -3,6 +3,6 @@
 ## How to build
 
 Same as https://github.com/goharbor/harbor
-With the patch https://github.com/goharbor/harbor/compare/v2.6.2...morlay:patch-v2.6.2
+With the patch https://github.com/goharbor/harbor/compare/v2.8.3...morlay:patch-v2.8.3
 
 See more in https://github.com/octohelm/harbor/blob/main/.github/workflows/docker-publish-images.yml
